@@ -1,0 +1,7 @@
+/target
+.idea
+.vscode
+.env
+plugins/*.wasm
+db_data
+.DS_Store

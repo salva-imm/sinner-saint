@@ -1,0 +1,57 @@
+package local:sinner-saint;
+
+interface db-storage {
+    get-state: func(key: string) -> option<string>;
+    set-state: func(key: string, value: string);
+    delete-state: func(key: string);
+}
+
+interface handler {
+    record telegram-user {
+        id: s64,
+        username: option<string>,
+        is-bot: bool,
+        language-code: option<string>,
+    }
+
+    record chat-context {
+        id: s64,
+        chat-type: string,
+        title: option<string>,
+    }
+
+    variant trigger-event {
+        message(string),
+        command(tuple<string, list<string>>),
+        inline-query(string),
+        callback-query(string),
+        chosen-inline-result(string)
+    }
+
+    record inline-switch-pm {
+        text: string,
+        start-parameter: string,
+    }
+
+    record inline-response {
+        results-json: string,
+        switch-pm: option<inline-switch-pm>,
+        cache-time: option<u32>,
+    }
+
+    variant plugin-response {
+        text(string),
+        inline(inline-response),
+        edit-inline(string),
+        none,
+    }
+
+    process-message: func(text: string) -> string;
+
+    process-event: func(user: telegram-user, chat: chat-context, event: trigger-event, timestamp: u64) -> plugin-response;
+}
+
+world plugin {
+    import db-storage;
+    export handler;
+}
